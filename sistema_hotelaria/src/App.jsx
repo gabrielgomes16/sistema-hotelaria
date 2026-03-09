@@ -2,7 +2,6 @@ import './App.css'
 /* Adicionando os componentes/paginas */
 import Home from './components/pages/Home';
 import Contato from './components/pages/Contato';
-import About from './components/pages/About';
 import Hospedes from './components/pages/Hospedes';
 import Quartos from './components/pages/Quartos';
 import Hospedagens from './components/pages/Hospedagens';
@@ -24,7 +23,6 @@ function App() {
           <NavbarTWM />
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
             <Route path="/contato" element={<Contato />} />
             <Route path="/hospedes" element={<Hospedes />} />
             <Route path="/quartos" element={<Quartos />} />
