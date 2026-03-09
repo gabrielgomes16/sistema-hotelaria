@@ -1,0 +1,11 @@
+No back: 
+npm install
+nodemon app.js 
+Obs: se o nodemon não der certo, tem que baixar as dependências
+
+No Front:
+npm install
+npm run dev
+"clicla no link que vai pro site"
+
+Obs2: é bom o back e o front funcionarem ao mesmo tempo pra ficar show 
