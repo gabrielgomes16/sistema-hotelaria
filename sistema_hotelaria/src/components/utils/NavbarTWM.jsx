@@ -13,7 +13,6 @@ function NavbarTWM() {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
             <Nav.Link href="/">Home</Nav.Link>
-            <Nav.Link href="/about">About</Nav.Link>
             <NavDropdown title="Cadastros" id="basic-nav-dropdown">
               <NavDropdown.Item href="/hospedes">Hóspedes</NavDropdown.Item>
               <NavDropdown.Item href="/quartos">Quartos</NavDropdown.Item>
