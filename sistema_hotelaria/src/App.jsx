@@ -5,6 +5,9 @@ import Contato from './components/pages/Contato';
 import Hospedes from './components/pages/Hospedes';
 import Quartos from './components/pages/Quartos';
 import Hospedagens from './components/pages/Hospedagens';
+import Alimentacao from './components/pages/Alimentacao';
+import Manutencao from './components/pages/Manutencao';
+import Limpeza from './components/pages/Limpeza';
 import NavbarTWM from './components/utils/NavbarTWM';
 /* Adicionando os componentes de navegacao do React */
 import { BrowserRouter as Router, 
@@ -27,6 +30,9 @@ function App() {
             <Route path="/hospedes" element={<Hospedes />} />
             <Route path="/quartos" element={<Quartos />} />
             <Route path="/hospedagens" element={<Hospedagens />} />
+            <Route path="/alimentacao" element={<Alimentacao />} />
+            <Route path="/manutencao" element={<Manutencao />} />
+            <Route path="/limpeza" element={<Limpeza />} />
           </Routes>
         </Router>
     </>
