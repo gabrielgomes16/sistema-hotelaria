@@ -20,8 +20,8 @@ function NavbarTWM() {
             </NavDropdown>
             <NavDropdown title="Serviços" id="basic-nav-dropdown">
               <NavDropdown.Item href="/alimentacao">Alimentação</NavDropdown.Item>
-              <NavDropdown.Item href="/quartos">Quartos</NavDropdown.Item>
-              <NavDropdown.Item href="/hospedagens">Hospedagens</NavDropdown.Item>
+              <NavDropdown.Item href="/manutencao">Manutenção</NavDropdown.Item>
+              <NavDropdown.Item href="/limpeza">Limpeza</NavDropdown.Item>
             </NavDropdown>
           </Nav>
         </Navbar.Collapse>
