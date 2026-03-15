@@ -10,7 +10,6 @@ import InputGroup from 'react-bootstrap/InputGroup';
 function Manutencao() {
   const [quarto, setQuarto                ] = useState('');
   const [problema, setProblema            ] = useState('');
-  const [preco, setPreco                  ] = useState('');
   const [observacoes, setObservacoes      ] = useState('');
   const [quartos, setQuartos              ] = useState([]);
   const [manutencao, setManutencao        ] = useState([]);
@@ -58,10 +57,6 @@ function Manutencao() {
     setProblema(event.target.value);
   };
 
-  const handlePreco= (event) => {
-    setPreco(event.target.value);
-  };
-
   const handleObservacoes = (event) => {
     setObservacoes(event.target.value);
   };
@@ -77,7 +72,6 @@ function Manutencao() {
       const dataToSend = {
         id_quarto: parseInt(quarto),
         problema: problema,
-        preco: parseFloat(preco),
         observacoes: observacoes
       };
 
@@ -87,7 +81,6 @@ function Manutencao() {
         });
 
       setQuarto('');
-      setPreco('');
       setObservacoes('');
       setCarregaPagina(!carregaPagina);
 
@@ -102,7 +95,6 @@ function Manutencao() {
       .then((response) => {
         setQuarto(response.data['id_quarto']);
         setProblema(response.data['problema']);
-        setPreco(response.data['preco']);
         setObservacoes(response.data['observacoes']);
         console.log(response);
       });
@@ -116,7 +108,6 @@ function Manutencao() {
         setCarregaPagina(!carregaPagina);
         setQuarto('');
         setProblema('');
-        setPreco('');
         setObservacoes('');
       })
       .catch((error) => {
@@ -145,7 +136,7 @@ function Manutencao() {
                 </Form.Select>
               </Form.Group>
             </Col>
-            <Col sm={3}>
+            <Col sm={6}>
               <Form.Group className="col-md3" controlId="formBasicTipo">
                 <Form.Label>Problema</Form.Label>
                 <Form.Select onChange={handleProblema} value={problema}>
@@ -157,29 +148,6 @@ function Manutencao() {
                   <option value="outro">Outro</option>
                 </Form.Select>
               </Form.Group>
-            </Col>
-            <Col sm={3}>
-              <Form.Group className="col-md3" controlId="formBasicPreco">
-                <Form.Label>Preço</Form.Label>
-                <InputGroup>
-                  <InputGroup.Text id="moeda-addon">R$</InputGroup.Text>
-                <Form.Control type="number" placeholder="Preço" onChange={handlePreco} value={preco} step="0.01"/>
-                </InputGroup>
-              </Form.Group>
-            </Col>
-          </Row>
-
-          <Row>
-            <Col sm={3}>
-            </Col>
-            <Col sm={3}>
-
-            </Col>
-            <Col sm={2}>
-
-            </Col>
-            <Col sm={4}>
-
             </Col>
           </Row>
 
