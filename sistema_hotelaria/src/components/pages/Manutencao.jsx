@@ -7,7 +7,10 @@ import { Row, Col } from 'react-bootstrap';
 import axios from "axios";
 import InputGroup from 'react-bootstrap/InputGroup';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 function Manutencao() {
+  const [idManutencao, setIdManutencao    ] = useState(0);
   const [quarto, setQuarto                ] = useState('');
   const [problema, setProblema            ] = useState('');
   const [preco, setPreco                  ] = useState('');
@@ -20,8 +23,8 @@ function Manutencao() {
     const fetchData = async () => {
       try {
         const [manutencaoRes, quartosRes] = await Promise.all([
-          fetch('http://localhost:3000/manutencao/'),
-          fetch('http://localhost:3000/quartos/')
+          fetch(`${API_URL}/manutencao`),
+          fetch(`${API_URL}/quartos`)
         ]);
 
         if (!manutencaoRes.ok || !quartosRes.ok) {
@@ -66,6 +69,14 @@ function Manutencao() {
     setObservacoes(event.target.value);
   };
 
+  const limparFormulario = () => {
+      setIdManutencao(0);
+      setQuarto('');
+      setProblema('');
+      setPreco('');
+      setObservacoes('');
+  };
+
   const salvarPedido = async (e) => {
     e.preventDefault();
     try {
@@ -81,25 +92,38 @@ function Manutencao() {
         observacoes: observacoes
       };
 
-      axios.post('http://localhost:3000/manutencao/', dataToSend)
-        .then(function (response) {
-          console.log('Success:', response.data);
-        });
-
-      setQuarto('');
-      setPreco('');
-      setObservacoes('');
-      setCarregaPagina(!carregaPagina);
+      if (idManutencao > 0) {
+          axios.put(`${API_URL}/manutencao/${idManutencao}`, dataToSend)
+          .then(function (response) {
+            console.log('Pedido atualizado:', response.data);
+            limparFormulario();
+            setCarregaPagina(!carregaPagina);
+          })
+          .catch(function (error) {
+            console.error('Erro ao atualizar:', error);
+          });
+      } else {
+          axios.post(`${API_URL}/manutencao`, dataToSend)
+          .then(function (response) {
+            console.log('Success:', response.data);
+            limparFormulario();
+            setCarregaPagina(!carregaPagina);
+          })
+          .catch(function (error) {
+            console.error('Erro ao criar:', error);
+          });
+      }
 
     } catch (error) {
-      console.error('Error during POST request:', error);
+      console.error('Error during request:', error);
     }
   };
 
   const handleSelecao = (id) => {
     console.log(id);
-    axios.get('http://localhost:3000/manutencao/' + id)
+    axios.get(`${API_URL}/manutencao/${id}`)
       .then((response) => {
+        setIdManutencao(response.data['id_manutencao']);
         setQuarto(response.data['id_quarto']);
         setProblema(response.data['problema']);
         setPreco(response.data['preco']);
@@ -109,15 +133,13 @@ function Manutencao() {
   };
 
   const deletarPedido = (id) => {
+    if (!window.confirm('Confirmar exclusão?')) return;
     console.log("Deletando pedido:", id);
-    axios.delete('http://localhost:3000/manutencao/' + id)
+    axios.delete(`${API_URL}/manutencao/${id}`)
       .then((response) => {
         console.log('Pedido deletada com sucesso:', response.data);
+        limparFormulario();
         setCarregaPagina(!carregaPagina);
-        setQuarto('');
-        setProblema('');
-        setPreco('');
-        setObservacoes('');
       })
       .catch((error) => {
         console.error('Erro ao deletar pedido:', error);
@@ -149,7 +171,7 @@ function Manutencao() {
               <Form.Group className="col-md3" controlId="formBasicTipo">
                 <Form.Label>Problema</Form.Label>
                 <Form.Select onChange={handleProblema} value={problema}>
-                  <option value="">Selecione o Prolema</option>
+                  <option value="">Selecione o Problema</option>
                   <option value="ar-condicionado">Ar-condicionado</option>
                   <option value="chuveiro">Chuveiro</option>
                   <option value="energia">Energia</option>
@@ -200,7 +222,11 @@ function Manutencao() {
 
           <br></br>
           <Button variant="success" onClick={salvarPedido}>
-            Salvar Pedido
+            {idManutencao > 0 ? 'Atualizar Pedido' : 'Salvar Pedido'}
+          </Button>
+          {' '}
+          <Button variant="secondary" onClick={limparFormulario}>
+            Limpar
           </Button>
           <ManutencaoLista 
             data={manutencao} 

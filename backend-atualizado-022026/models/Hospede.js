@@ -6,7 +6,10 @@ const Hospede = sequelize.define('Hospede', {
   nome: { type: DataTypes.STRING(100), allowNull: false },
   email: { type: DataTypes.STRING(100) },
   telefone: { type: DataTypes.STRING(20) },
-  cpf: { type: DataTypes.STRING(14) }
+  cpf: { type: DataTypes.STRING(14) },
+  cep: { type: DataTypes.STRING(9) },
+  rua: { type: DataTypes.STRING(100) },
+  numero: { type: DataTypes.STRING(10) }
 }, { tableName: 'Hospede', timestamps: false });
 
 module.exports = Hospede;

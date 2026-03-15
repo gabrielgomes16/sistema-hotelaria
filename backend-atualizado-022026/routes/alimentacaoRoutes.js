@@ -11,6 +11,7 @@ router.get('/api', (req, res) => {
 });
 
 router.post('/', alimentacaoControler.criar);
+router.put('/:id', alimentacaoControler.atualizar);
 router.get('/', alimentacaoControler.listar);
 router.get('/:id', alimentacaoControler.buscarPorId);
 router.delete('/:id', alimentacaoControler.remover);

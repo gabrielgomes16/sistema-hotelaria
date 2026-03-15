@@ -47,6 +47,46 @@ exports.buscarPorId = async (req, res) => {
   res.json(hospedagem);
 };
 
+exports.atualizar = async (req, res) => {
+  const transaction = await sequelize.transaction();
+
+  try {
+    const hospedagem = await Hospedagem.findByPk(req.params.id, { transaction });
+
+    if (!hospedagem) {
+      await transaction.rollback();
+      return res.status(404).json({ error: 'Hospedagem não encontrada.' });
+    }
+
+    const { id_quarto } = req.body;
+
+    if (id_quarto && id_quarto !== hospedagem.id_quarto) {
+      const quartoAnterior = await Quarto.findByPk(hospedagem.id_quarto, { transaction });
+      if (quartoAnterior) {
+        await quartoAnterior.update({ status: 'disponível' }, { transaction });
+      }
+
+      const novoQuarto = await Quarto.findByPk(id_quarto, { transaction });
+      if (!novoQuarto) {
+        await transaction.rollback();
+        return res.status(404).json({ error: 'Novo quarto não encontrado.' });
+      }
+      if (novoQuarto.status !== 'disponível') {
+        await transaction.rollback();
+        return res.status(400).json({ error: 'Novo quarto não está disponível.' });
+      }
+      await novoQuarto.update({ status: 'ocupado' }, { transaction });
+    }
+
+    await hospedagem.update(req.body, { transaction });
+    await transaction.commit();
+    return res.json(hospedagem);
+  } catch (error) {
+    await transaction.rollback();
+    return res.status(500).json({ error: 'Erro ao atualizar hospedagem.' });
+  }
+};
+
 exports.remover = async (req, res) => {
   const transaction = await sequelize.transaction();
 

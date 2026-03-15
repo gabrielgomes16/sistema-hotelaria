@@ -7,7 +7,10 @@ import { Row, Col } from 'react-bootstrap';
 import axios from "axios";
 import InputGroup from 'react-bootstrap/InputGroup';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 function Alimentacao() {
+  const [idAlimentacao, setIdAlimentacao  ] = useState(0);
   const [quarto, setQuarto                ] = useState('');
   const [prato, setPrato                  ] = useState('');
   const [preco, setPreco                  ] = useState('');
@@ -21,8 +24,8 @@ function Alimentacao() {
     const fetchData = async () => {
       try {
         const [alimentacaoRes, quartosRes] = await Promise.all([
-          fetch('http://localhost:3000/alimentacao/'),
-          fetch('http://localhost:3000/quartos/')
+          fetch(`${API_URL}/alimentacao`),
+          fetch(`${API_URL}/quartos`)
         ]);
 
         if (!alimentacaoRes.ok || !quartosRes.ok) {
@@ -71,6 +74,15 @@ function Alimentacao() {
     setObservacoes(event.target.value);
   };
 
+  const limparFormulario = () => {
+      setIdAlimentacao(0);
+      setQuarto('');
+      setPrato('');
+      setPreco('');
+      setQuantidade('');
+      setObservacoes('');
+  };
+
   const salvarPedido = async (e) => {
     e.preventDefault();
     try {
@@ -87,26 +99,38 @@ function Alimentacao() {
         observacoes: observacoes
       };
 
-      axios.post('http://localhost:3000/alimentacao/', dataToSend)
-        .then(function (response) {
-          console.log('Success:', response.data);
-        });
-
-      setQuarto('');
-      setPreco('');
-      setQuantidade('');
-      setObservacoes('');
-      setCarregaPagina(!carregaPagina);
+      if (idAlimentacao > 0) {
+          axios.put(`${API_URL}/alimentacao/${idAlimentacao}`, dataToSend)
+          .then(function (response) {
+            console.log('Pedido atualizado:', response.data);
+            limparFormulario();
+            setCarregaPagina(!carregaPagina);
+          })
+          .catch(function (error) {
+            console.error('Erro ao atualizar:', error);
+          });
+      } else {
+          axios.post(`${API_URL}/alimentacao`, dataToSend)
+          .then(function (response) {
+            console.log('Success:', response.data);
+            limparFormulario();
+            setCarregaPagina(!carregaPagina);
+          })
+          .catch(function (error) {
+            console.error('Erro ao criar:', error);
+          });
+      }
 
     } catch (error) {
-      console.error('Error during POST request:', error);
+      console.error('Error during request:', error);
     }
   };
 
   const handleSelecao = (id) => {
     console.log(id);
-    axios.get('http://localhost:3000/alimentacao/' + id)
+    axios.get(`${API_URL}/alimentacao/${id}`)
       .then((response) => {
+        setIdAlimentacao(response.data['id_alimentacao']);
         setQuarto(response.data['id_quarto']);
         setPrato(response.data['prato']);
         setPreco(response.data['preco']);
@@ -117,16 +141,13 @@ function Alimentacao() {
   };
 
   const deletarPedido = (id) => {
+    if (!window.confirm('Confirmar exclusão?')) return;
     console.log("Deletando pedido:", id);
-    axios.delete('http://localhost:3000/alimentacao/' + id)
+    axios.delete(`${API_URL}/alimentacao/${id}`)
       .then((response) => {
         console.log('Pedido deletada com sucesso:', response.data);
+        limparFormulario();
         setCarregaPagina(!carregaPagina);
-        setQuarto('');
-        setPrato('');
-        setPreco('');
-        setQuantidade('');
-        setObservacoes('');
       })
       .catch((error) => {
         console.error('Erro ao deletar pedido:', error);
@@ -146,7 +167,7 @@ function Alimentacao() {
                 <Form.Label>Quarto *</Form.Label>
                 <Form.Select onChange={handleQuarto} value={quarto}>
                   <option value="">Selecione um quarto</option>
-                  {quartos.filter(q => q.status === 'disponível').map((q) => (
+                  {quartos.filter(q => q.status === 'ocupado').map((q) => (
                     <option key={q.id_quarto} value={q.id_quarto}>
                       Quarto {q.numero} - {q.tipo} 
                     </option>
@@ -212,7 +233,11 @@ function Alimentacao() {
 
           <br></br>
           <Button variant="success" onClick={salvarPedido}>
-            Salvar Pedido
+            {idAlimentacao > 0 ? 'Atualizar Pedido' : 'Salvar Pedido'}
+          </Button>
+          {' '}
+          <Button variant="secondary" onClick={limparFormulario}>
+            Limpar
           </Button>
           <AlimentacaoLista 
             data={alimentacao} 

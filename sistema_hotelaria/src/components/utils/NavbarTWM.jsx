@@ -12,16 +12,16 @@ function NavbarTWM() {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
-            <Nav.Link href="/">Home</Nav.Link>
-            <NavDropdown title="Cadastros" id="basic-nav-dropdown">
-              <NavDropdown.Item href="/hospedes">Hóspedes</NavDropdown.Item>
-              <NavDropdown.Item href="/quartos">Quartos</NavDropdown.Item>
-              <NavDropdown.Item href="/hospedagens">Hospedagens</NavDropdown.Item>
+            <Nav.Link as={Link} to="/">Home</Nav.Link>
+            <NavDropdown title="Cadastros" id="nav-dropdown-cadastros">
+              <NavDropdown.Item as={Link} to="/hospedes">Hóspedes</NavDropdown.Item>
+              <NavDropdown.Item as={Link} to="/quartos">Quartos</NavDropdown.Item>
+              <NavDropdown.Item as={Link} to="/hospedagens">Hospedagens</NavDropdown.Item>
             </NavDropdown>
-            <NavDropdown title="Serviços" id="basic-nav-dropdown">
-              <NavDropdown.Item href="/alimentacao">Alimentação</NavDropdown.Item>
-              <NavDropdown.Item href="/manutencao">Manutenção</NavDropdown.Item>
-              <NavDropdown.Item href="/limpeza">Limpeza</NavDropdown.Item>
+            <NavDropdown title="Serviços" id="nav-dropdown-servicos">
+              <NavDropdown.Item as={Link} to="/alimentacao">Alimentação</NavDropdown.Item>
+              <NavDropdown.Item as={Link} to="/manutencao">Manutenção</NavDropdown.Item>
+              <NavDropdown.Item as={Link} to="/limpeza">Limpeza</NavDropdown.Item>
             </NavDropdown>
           </Nav>
         </Navbar.Collapse>
