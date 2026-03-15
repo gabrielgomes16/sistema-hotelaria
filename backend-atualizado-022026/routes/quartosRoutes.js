@@ -13,6 +13,7 @@ router.get('/api', (req, res) => {
 router.post('/', quartoControler.criar);
 router.get('/', quartoControler.listar);
 router.get('/:id', quartoControler.buscarPorId);
+router.patch('/:id/status', quartoControler.atualizarStatus);
 router.delete('/:id', quartoControler.remover);
 
 module.exports = router;

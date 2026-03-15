@@ -191,19 +191,19 @@ function Hospedes() {
             <Col sm={6}>
               <Form.Group className="col-md3" controlId="formBasicNome">
                 <Form.Label>Nome</Form.Label>
-                <Form.Control type="text" placeholder="nome" onChange={handleNome} value={nome}/>
+                <Form.Control type="text" placeholder="Nome" onChange={handleNome} value={nome}/>
               </Form.Group>
             </Col>
             <Col sm={3}>
               <Form.Group className="col-md3" controlId="formBasicEmail">
                 <Form.Label>Email</Form.Label>
-                <Form.Control type="email" placeholder="email" onChange={handleEmail} value={email}/>
+                <Form.Control type="email" placeholder="Email" onChange={handleEmail} value={email}/>
               </Form.Group>
             </Col>
             <Col sm={3}>
               <Form.Group className="col-md3" controlId="formTelefone">
                 <Form.Label>Telefone</Form.Label>
-                <Form.Control type="text" placeholder="telefone" onChange={handleTelefone} value={telefone}/>
+                <Form.Control type="text" placeholder="Telefone" onChange={handleTelefone} value={telefone}/>
               </Form.Group>
             </Col>
           </Row>

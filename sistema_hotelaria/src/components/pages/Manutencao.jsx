@@ -137,7 +137,7 @@ function Manutencao() {
                 <Form.Label>Quarto *</Form.Label>
                 <Form.Select onChange={handleQuarto} value={quarto}>
                   <option value="">Selecione um quarto</option>
-                  {quartos.filter(q => q.status === 'disponível').map((q) => (
+                  {quartos.filter(q => (q.status || 'disponível') === 'disponível').map((q) => (
                     <option key={q.id_quarto} value={q.id_quarto}>
                       Quarto {q.numero} - {q.tipo} 
                     </option>
@@ -163,7 +163,7 @@ function Manutencao() {
                 <Form.Label>Preço</Form.Label>
                 <InputGroup>
                   <InputGroup.Text id="moeda-addon">R$</InputGroup.Text>
-                <Form.Control type="number" placeholder="preço" onChange={handlePreco} value={preco} step="0.01"/>
+                <Form.Control type="number" placeholder="Preço" onChange={handlePreco} value={preco} step="0.01"/>
                 </InputGroup>
               </Form.Group>
             </Col>

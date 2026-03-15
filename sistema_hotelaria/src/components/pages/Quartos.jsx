@@ -47,7 +47,7 @@ function Quartos() {
               tipo: tipo,
               preco: parseFloat(preco),
               descricao: descricao,
-              status: status
+          status: 'disponível'
           };
           axios.post('http://localhost:3000/quartos/', dataToSend)
           .then(function (response) {
@@ -81,10 +81,6 @@ function Quartos() {
 
   const handleDescricao = (event) => {
       setDescricao(event.target.value);
-  }
-
-  const handleStatus = (event) => {
-      setStatus(event.target.value);
   }
 
   const handleSelecao = (id) => {
@@ -131,7 +127,7 @@ function Quartos() {
             <Col sm={3}>
               <Form.Group className="col-md3" controlId="formBasicNumero">
                 <Form.Label>Número</Form.Label>
-                <Form.Control type="text" placeholder="número" onChange={handleNumero} value={numero}/>
+                <Form.Control type="text" placeholder="Número" onChange={handleNumero} value={numero}/>
               </Form.Group>
             </Col>
             <Col sm={3}>
@@ -149,17 +145,13 @@ function Quartos() {
             <Col sm={3}>
               <Form.Group className="col-md3" controlId="formBasicPreco">
                 <Form.Label>Preço</Form.Label>
-                <Form.Control type="number" placeholder="preço" onChange={handlePreco} value={preco} step="0.01"/>
+                <Form.Control type="number" placeholder="Preço" onChange={handlePreco} value={preco} step="0.01"/>
               </Form.Group>
             </Col>
             <Col sm={3}>
               <Form.Group className="col-md3" controlId="formBasicStatus">
                 <Form.Label>Status</Form.Label>
-                <Form.Select onChange={handleStatus} value={status}>
-                  <option value="disponível">Disponível</option>
-                  <option value="ocupado">Ocupado</option>
-                  <option value="manutenção">Manutenção</option>
-                </Form.Select>
+                <Form.Control type="text" value={status || 'disponível'} disabled />
               </Form.Group>
             </Col>
           </Row>
