@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
-import Modal from 'react-bootstrap/Modal'; // <-- NOVO: Importando Modal
+import Modal from 'react-bootstrap/Modal'; 
 import AlimentacaoLista from './AlimentacaoLista';
 import Card from "react-bootstrap/Card";
 import { Row, Col } from 'react-bootstrap';
