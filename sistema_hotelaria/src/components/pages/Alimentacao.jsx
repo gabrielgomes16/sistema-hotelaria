@@ -171,7 +171,7 @@ function Alimentacao() {
                 <Form.Label>Preço</Form.Label>
                 <InputGroup>
                   <InputGroup.Text id="moeda-addon">R$</InputGroup.Text>
-                <Form.Control type="number" placeholder="preço" onChange={handlePreco} value={preco} step="0.01"/>
+                <Form.Control type="number" placeholder="Preço" onChange={handlePreco} value={preco} step="0.01"/>
                 </InputGroup>
               </Form.Group>
             </Col>
@@ -181,7 +181,7 @@ function Alimentacao() {
             <Col sm={3}>
               <Form.Group className="col-md3" controlId="formBasicQuantidade">
                 <Form.Label>Quantidade</Form.Label>
-                <Form.Control type="number" placeholder="quantidade" onChange={handleQuantidade} value={quantidade} />
+                <Form.Control type="number" placeholder="Quantidade" onChange={handleQuantidade} value={quantidade} />
               </Form.Group>
             </Col>
             <Col sm={3}>

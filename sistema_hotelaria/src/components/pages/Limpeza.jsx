@@ -163,7 +163,7 @@ function Limpeza() {
                 <Form.Label>Preço</Form.Label>
                 <InputGroup>
                   <InputGroup.Text id="moeda-addon">R$</InputGroup.Text>
-                <Form.Control type="number" placeholder="preço" onChange={handlePreco} value={preco} step="0.01"/>
+                <Form.Control type="number" placeholder="Preço" onChange={handlePreco} value={preco} step="0.01"/>
                 </InputGroup>
               </Form.Group>
             </Col>

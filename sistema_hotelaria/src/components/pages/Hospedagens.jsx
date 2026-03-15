@@ -207,7 +207,7 @@ function Hospedagens() {
                 <Form.Label>Quarto *</Form.Label>
                 <Form.Select onChange={handleQuarto} value={quarto}>
                   <option value="">Selecione um quarto</option>
-                  {quartos.filter(q => q.status === 'disponível').map((q) => (
+                  {quartos.filter(q => (q.status || 'disponível') === 'disponível').map((q) => (
                     <option key={q.id_quarto} value={q.id_quarto}>
                       Quarto {q.numero} - {q.tipo} (R$ {parseFloat(q.preco).toFixed(2)})
                     </option>
