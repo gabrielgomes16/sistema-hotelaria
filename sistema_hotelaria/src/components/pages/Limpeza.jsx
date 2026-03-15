@@ -10,6 +10,7 @@ import InputGroup from 'react-bootstrap/InputGroup';
 function Limpeza() {
   const [quarto, setQuarto                ] = useState('');
   const [tipo, setTipo                    ] = useState('');
+  const [preco, setPreco                  ] = useState('');
   const [observacoes, setObservacoes      ] = useState('');
   const [quartos, setQuartos              ] = useState([]);
   const [limpeza, setLimpeza      ] = useState([]);
@@ -57,6 +58,10 @@ function Limpeza() {
     setTipo(event.target.value);
   };
 
+  const handlePreco= (event) => {
+    setPreco(event.target.value);
+  };
+
   const handleObservacoes = (event) => {
     setObservacoes(event.target.value);
   };
@@ -72,6 +77,7 @@ function Limpeza() {
       const dataToSend = {
         id_quarto: parseInt(quarto),
         tipo: tipo,
+        preco: parseFloat(preco),
         observacoes: observacoes
       };
 
@@ -81,6 +87,7 @@ function Limpeza() {
         });
 
       setQuarto('');
+      setPreco('');
       setObservacoes('');
       setCarregaPagina(!carregaPagina);
 
@@ -95,6 +102,7 @@ function Limpeza() {
       .then((response) => {
         setQuarto(response.data['id_quarto']);
         setTipo(response.data['tipo']);
+        setPreco(response.data['preco']);
         setObservacoes(response.data['observacoes']);
         console.log(response);
       });
@@ -108,6 +116,7 @@ function Limpeza() {
         setCarregaPagina(!carregaPagina);
         setQuarto('');
         setTipo('');
+        setPreco('');
         setObservacoes('');
       })
       .catch((error) => {
@@ -136,7 +145,7 @@ function Limpeza() {
                 </Form.Select>
               </Form.Group>
             </Col>
-            <Col sm={6}>
+            <Col sm={3}>
               <Form.Group className="col-md3" controlId="formBasicTipo">
                 <Form.Label>Tipo</Form.Label>
                 <Form.Select onChange={handleTipo} value={tipo}>
@@ -148,6 +157,29 @@ function Limpeza() {
                   <option value="outro">Outro</option>
                 </Form.Select>
               </Form.Group>
+            </Col>
+            <Col sm={3}>
+              <Form.Group className="col-md3" controlId="formBasicPreco">
+                <Form.Label>Preço</Form.Label>
+                <InputGroup>
+                  <InputGroup.Text id="moeda-addon">R$</InputGroup.Text>
+                <Form.Control type="number" placeholder="Preço" onChange={handlePreco} value={preco} step="0.01"/>
+                </InputGroup>
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <Row>
+            <Col sm={3}>
+            </Col>
+            <Col sm={3}>
+
+            </Col>
+            <Col sm={2}>
+
+            </Col>
+            <Col sm={4}>
+
             </Col>
           </Row>
 
