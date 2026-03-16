@@ -77,5 +77,16 @@ exports.atualizar = async (req, res) => {
 };
 
 exports.remover = async (req, res) => {
-  res.status(204).send();
+  try {
+    const quarto = await Quarto.findByPk(req.params.id);
+
+    if (!quarto) {
+      return res.status(404).json({ error: 'Quarto não encontrado.' });
+    }
+
+    await quarto.destroy();
+    res.status(204).send();
+  } catch (error) {
+    return res.status(500).json({ error: 'Erro ao remover quarto.' });
+  }
 };
