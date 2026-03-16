@@ -13,7 +13,6 @@ function Limpeza() {
   const [idLimpeza, setIdLimpeza          ] = useState(0);
   const [quarto, setQuarto                ] = useState('');
   const [tipo, setTipo                    ] = useState('');
-  const [preco, setPreco                  ] = useState('');
   const [observacoes, setObservacoes      ] = useState('');
   const [quartos, setQuartos              ] = useState([]);
   const [limpeza, setLimpeza      ] = useState([]);
@@ -61,10 +60,6 @@ function Limpeza() {
     setTipo(event.target.value);
   };
 
-  const handlePreco= (event) => {
-    setPreco(event.target.value);
-  };
-
   const handleObservacoes = (event) => {
     setObservacoes(event.target.value);
   };
@@ -73,7 +68,6 @@ function Limpeza() {
       setIdLimpeza(0);
       setQuarto('');
       setTipo('');
-      setPreco('');
       setObservacoes('');
   };
 
@@ -88,7 +82,6 @@ function Limpeza() {
       const dataToSend = {
         id_quarto: parseInt(quarto),
         tipo: tipo,
-        preco: parseFloat(preco),
         observacoes: observacoes
       };
 
@@ -126,7 +119,6 @@ function Limpeza() {
         setIdLimpeza(response.data['id_limpeza']);
         setQuarto(response.data['id_quarto']);
         setTipo(response.data['tipo']);
-        setPreco(response.data['preco']);
         setObservacoes(response.data['observacoes']);
         console.log(response);
       });
@@ -167,7 +159,7 @@ function Limpeza() {
                 </Form.Select>
               </Form.Group>
             </Col>
-            <Col sm={3}>
+            <Col sm={6}>
               <Form.Group className="col-md3" controlId="formBasicTipo">
                 <Form.Label>Tipo</Form.Label>
                 <Form.Select onChange={handleTipo} value={tipo}>
@@ -180,31 +172,7 @@ function Limpeza() {
                 </Form.Select>
               </Form.Group>
             </Col>
-            <Col sm={3}>
-              <Form.Group className="col-md3" controlId="formBasicPreco">
-                <Form.Label>Preço</Form.Label>
-                <InputGroup>
-                  <InputGroup.Text id="moeda-addon">R$</InputGroup.Text>
-                <Form.Control type="number" placeholder="Preço" onChange={handlePreco} value={preco} step="0.01"/>
-                </InputGroup>
-              </Form.Group>
-            </Col>
           </Row>
-
-          <Row>
-            <Col sm={3}>
-            </Col>
-            <Col sm={3}>
-
-            </Col>
-            <Col sm={2}>
-
-            </Col>
-            <Col sm={4}>
-
-            </Col>
-          </Row>
-
           <Row>
             <Col sm={12}>
               <Form.Group controlId="formObservacoes">

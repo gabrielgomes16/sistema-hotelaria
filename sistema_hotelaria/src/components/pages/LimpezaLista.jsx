@@ -13,18 +13,6 @@ export default function LimpezaLista(props) {
     return quarto ? quarto.tipo : 'N/A';
   };
 
-  const formatarMoeda = (valor) => {
-    const numero = parseFloat(valor);
-    
-      if (isNaN(numero)) return 'R$ 0,00'; 
-
-      return new Intl.NumberFormat('pt-BR', {
-        style: 'currency',
-        currency: 'BRL'
-      }).format(numero);
-  };
-
-
   return (
     <>
       <br></br>
@@ -34,7 +22,6 @@ export default function LimpezaLista(props) {
             <th scope="col">#</th>
             <th scope="col">ID</th>
             <th scope="col">Tipo</th>
-            <th scope="col">Valor Total</th>
             <th scope="col">Quarto</th>
             <th scope="col">Ação</th>
           </tr>
@@ -51,7 +38,6 @@ export default function LimpezaLista(props) {
               </td>
               <td> {limpeza.id_limpeza}</td>
               <td> {limpeza.tipo} </td>
-              <td> {formatarMoeda(limpeza.preco)}  </td>
               <td> {getNumeroQuarto(limpeza.id_quarto)} ({getTipoQuarto(limpeza.id_quarto)})</td>
 
               <td>
