@@ -151,7 +151,7 @@ function Limpeza() {
                 <Form.Label>Quarto *</Form.Label>
                 <Form.Select onChange={handleQuarto} value={quarto}>
                   <option value="">Selecione um quarto</option>
-                  {quartos.filter(q => q.status === 'ocupado').map((q) => (
+                  {quartos.map((q) => (
                     <option key={q.id_quarto} value={q.id_quarto}>
                       Quarto {q.numero} - {q.tipo} 
                     </option>

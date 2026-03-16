@@ -21,18 +21,7 @@ function Alimentacao() {
   const [alimentacao, setAlimentacao      ] = useState([]);
   const [carregaPagina, setCarregaPagina] = useState(false);
 
-  const [opcoesPratos, setOpcoesPratos] = useState(() => {
-    const pratosSalvos = localStorage.getItem('cardapioHotel');
-    if (pratosSalvos) {
-      return JSON.parse(pratosSalvos);
-    }
-    return [
-      { id: 'macarrao', nome: 'Macarrão', precoPadrao: 25.00 },
-      { id: 'executivo', nome: 'Executivo', precoPadrao: 30.00 },
-      { id: 'hamburguer', nome: 'Hambúrguer', precoPadrao: 20.00 },
-      { id: 'pizza', nome: 'Pizza', precoPadrao: 45.00 }
-    ];
-  });
+  const [opcoesPratos, setOpcoesPratos] = useState([]);
 
   const [showModalPrato, setShowModalPrato] = useState(false);
   const [novoPratoNome, setNovoPratoNome] = useState('');
@@ -41,20 +30,23 @@ function Alimentacao() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [alimentacaoRes, quartosRes] = await Promise.all([
+        const [alimentacaoRes, quartosRes, cardapioRes] = await Promise.all([
           fetch(`${API_URL}/alimentacao`),
-          fetch(`${API_URL}/quartos`)
+          fetch(`${API_URL}/quartos`),
+          fetch(`${API_URL}/cardapio`)
         ]);
 
-        if (!alimentacaoRes.ok || !quartosRes.ok) {
+        if (!alimentacaoRes.ok || !quartosRes.ok || !cardapioRes.ok) {
           throw new Error('HTTP error!');
         }
 
         const alimentacaoData = await alimentacaoRes.json();
         const quartosData = await quartosRes.json();
+        const cardapioData = await cardapioRes.json();
 
         setAlimentacao(alimentacaoData);
         setQuartos(quartosData);
+        setOpcoesPratos(cardapioData);
 
         console.log("Dados carregados");
       } catch (err) {
@@ -74,9 +66,9 @@ function Alimentacao() {
     const pratoSelecionadoId = event.target.value;
     setPrato(pratoSelecionadoId);
 
-    const pratoEncontrado = opcoesPratos.find(p => p.id === pratoSelecionadoId);
+    const pratoEncontrado = opcoesPratos.find(p => p.id_cardapio === parseInt(pratoSelecionadoId));
     if (pratoEncontrado) {
-      setPreco(pratoEncontrado.precoPadrao);
+      setPreco(pratoEncontrado.preco);
     } else {
       setPreco('');
     }
@@ -103,32 +95,32 @@ function Alimentacao() {
       setObservacoes('');
   };
 
-  const adicionarNovoPrato = () => {
+  const adicionarNovoPrato = async () => {
     if (!novoPratoNome || !novoPratoPreco) {
         alert("Preencha o nome e o preço do prato!");
         return;
     }
 
-    const novoId = novoPratoNome.toLowerCase().replace(/\s+/g, '');
-    
-    const novoPratoObj = {
-        id: novoId,
+    try {
+      const response = await axios.post(`${API_URL}/cardapio`, {
         nome: novoPratoNome,
-        precoPadrao: parseFloat(novoPratoPreco)
-    };
+        preco: parseFloat(novoPratoPreco)
+      });
 
-    const novaListaPratos = [...opcoesPratos, novoPratoObj];
-    
-    setOpcoesPratos(novaListaPratos);
+      const novoPrato = response.data;
 
-    localStorage.setItem('cardapioHotel', JSON.stringify(novaListaPratos));
+      setOpcoesPratos([...opcoesPratos, novoPrato]);
 
-    setShowModalPrato(false);
-    setNovoPratoNome('');
-    setNovoPratoPreco('');
-    
-    setPrato(novoId);
-    setPreco(novoPratoObj.precoPadrao);
+      setShowModalPrato(false);
+      setNovoPratoNome('');
+      setNovoPratoPreco('');
+
+      setPrato(String(novoPrato.id_cardapio));
+      setPreco(novoPrato.preco);
+    } catch (error) {
+      console.error('Erro ao salvar prato:', error);
+      alert('Erro ao salvar o prato no cardápio.');
+    }
   };
 
   const salvarPedido = async (e) => {
@@ -139,7 +131,7 @@ function Alimentacao() {
         return;
       }
 
-      const pratoSelecionado = opcoesPratos.find(p => p.id === prato);
+      const pratoSelecionado = opcoesPratos.find(p => p.id_cardapio === parseInt(prato));
       const nomeDoPratoParaSalvar = pratoSelecionado ? pratoSelecionado.nome : prato;
 
       const dataToSend = {
@@ -183,7 +175,9 @@ function Alimentacao() {
       .then((response) => {
         setIdAlimentacao(response.data['id_alimentacao']);
         setQuarto(response.data['id_quarto']);
-        setPrato(response.data['prato'].toLowerCase().replace(/\s+/g, '')); 
+        const pratoNome = response.data['prato'];
+        const pratoEncontrado = opcoesPratos.find(p => p.nome === pratoNome);
+        setPrato(pratoEncontrado ? String(pratoEncontrado.id_cardapio) : '');
         setPreco(response.data['preco']);
         setQuantidade(response.data['quantidade']);
         setObservacoes(response.data['observacoes']);
@@ -206,7 +200,7 @@ function Alimentacao() {
     <>
       <Card>
         <Card.Header className="card-header bg-success text-white">
-          <h1>Pedidos de Alimentação</h1>
+          <h1>Pedidos da Cozinha</h1>
         </Card.Header>
         <Card.Body>
           <Form>
@@ -232,7 +226,7 @@ function Alimentacao() {
                       <Form.Select onChange={handlePrato} value={prato}>
                         <option value="">Selecione o prato</option>
                         {opcoesPratos.map((opcao) => (
-                            <option key={opcao.id} value={opcao.id}>
+                            <option key={opcao.id_cardapio} value={opcao.id_cardapio}>
                                 {opcao.nome}
                             </option>
                         ))}
