@@ -7,6 +7,7 @@ import Card from "react-bootstrap/Card";
 import { Row, Col } from 'react-bootstrap';
 import axios from "axios";
 import DatePicker from '../utils/DatePicker';
+import { gerarRelatorioCheckout } from '../utils/relatorioCheckout';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -203,13 +204,13 @@ function Hospedagens() {
         return;
     }
 
-    const hospedagemAtiva = hospedagens.find(h => h.id_quarto === parseInt(idQuartoSelecionado));
+    const hospedagemAtiva = hospedagens.find(h => h.id_quarto === parseInt(idQuartoSelecionado) && h.status === 'aberta');
     
     if (hospedagemAtiva) {
         const hospedeAtivo = hospedes.find(h => h.id_hospede === hospedagemAtiva.id_hospede);
         
         const valorComidas = pedidosAlimentacao
-            .filter(pedido => pedido.id_quarto === parseInt(idQuartoSelecionado))
+            .filter(pedido => pedido.id_quarto === parseInt(idQuartoSelecionado) && pedido.status !== 'finalizado')
             .reduce((acc, pedido) => acc + ((parseFloat(pedido.preco) || 0) * (parseInt(pedido.quantidade) || 0)), 0);
 
         const valorQuarto = parseFloat(hospedagemAtiva.valorTotal) || 0;
@@ -227,14 +228,48 @@ function Hospedagens() {
 
   const finalizarCheckout = async () => {
       try {
-          const quartoAtual = quartos.find(q => q.id_quarto === parseInt(quartoCheckout));
-          
+          const idQuarto = parseInt(quartoCheckout);
+          const quartoAtual = quartos.find(q => q.id_quarto === idQuarto);
+          const hospedagemAtiva = hospedagens.find(h => h.id_quarto === idQuarto && h.status === 'aberta');
+          const hospedeAtivo = hospedagemAtiva 
+            ? hospedes.find(h => h.id_hospede === hospedagemAtiva.id_hospede) 
+            : null;
+          const pedidosDoQuarto = pedidosAlimentacao.filter(
+            p => p.id_quarto === idQuarto
+          );
+
+          // Gerar relatório XLSX antes de liberar o quarto
+          if (hospedeAtivo && quartoAtual && hospedagemAtiva) {
+            gerarRelatorioCheckout({
+              hospede: hospedeAtivo,
+              quarto: quartoAtual,
+              hospedagem: hospedagemAtiva,
+              pedidosAlimentacao: pedidosDoQuarto,
+            });
+          }
+
+          // 1. Liberar o quarto
           await axios.put(`${API_URL}/quartos/${quartoCheckout}`, {
               ...quartoAtual,
               status: 'disponível'
           });
 
-          alert("Checkout feito com sucesso! Quarto liberado.");
+          // 2. Finalizar pedidos de alimentação desse quarto
+          await Promise.all(
+            pedidosDoQuarto
+              .filter(p => p.status !== 'finalizado')
+              .map(p => axios.put(`${API_URL}/alimentacao/${p.id_alimentacao}`, { ...p, status: 'finalizado' }))
+          );
+
+          // 3. Fechar a hospedagem (status -> 'fechada')
+          if (hospedagemAtiva) {
+            await axios.put(`${API_URL}/hospedagens/${hospedagemAtiva.id_hospedagem}`, {
+              ...hospedagemAtiva,
+              status: 'fechada'
+            });
+          }
+
+          alert("Checkout feito com sucesso! Quarto liberado. O relatório foi baixado.");
           
           setShowCheckout(false);
           setQuartoCheckout('');
@@ -343,7 +378,7 @@ function Hospedagens() {
 
             <hr className="mt-5" />
             <HospedagensLista 
-              data={hospedagens} 
+              data={hospedagens.filter(h => h.status === 'aberta')} 
               hospedes={hospedes}
               quartos={quartos}
               handleSelecao={handleSelecao}
@@ -395,7 +430,7 @@ function Hospedagens() {
             onClick={finalizarCheckout}
             disabled={!dadosCheckout} // Desabilita se não tiver dados
           >
-            Checkout Feito (Liberar Quarto)
+            Checkout Feito (Liberar Quarto + Baixar Relatório)
           </Button>
         </Modal.Footer>
       </Modal>
