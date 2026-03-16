@@ -9,6 +9,9 @@ export default function HospedesLista(props) {
                 <th scope="col">#</th>
                 <th scope="col">id</th>
                 <th scope="col">Nome</th>
+                <th scope="col">Email</th>
+                <th scope="col">CPF</th>
+                <th scope="col">Telefone</th>
               </tr>
             </thead>
             <tbody>
@@ -23,6 +26,9 @@ export default function HospedesLista(props) {
                   </td>
                   <td> {hospede.id_hospede}</td>                  
                   <td> {hospede.nome}</td>
+                  <td> {hospede.email}</td>
+                  <td> {hospede.cpf}</td>
+                  <td> {hospede.telefone}</td>
                 </tr>
               ))}
             </tbody>

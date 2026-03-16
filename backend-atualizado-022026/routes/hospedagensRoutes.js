@@ -11,6 +11,7 @@ router.get('/api', (req, res) => {
 });
 
 router.post('/', hospedagemControler.criar);
+router.put('/:id', hospedagemControler.atualizar);
 router.get('/', hospedagemControler.listar);
 router.get('/:id', hospedagemControler.buscarPorId);
 router.delete('/:id', hospedagemControler.remover);

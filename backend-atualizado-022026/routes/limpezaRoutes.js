@@ -11,6 +11,7 @@ router.get('/api', (req, res) => {
 });
 
 router.post('/', limpezaControler.criar);
+router.put('/:id', limpezaControler.atualizar);
 router.get('/', limpezaControler.listar);
 router.get('/:id', limpezaControler.buscarPorId);
 router.delete('/:id', limpezaControler.remover);

@@ -6,7 +6,10 @@ import Card from "react-bootstrap/Card";
 import { Row, Col } from 'react-bootstrap';
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 function Quartos() {
+  const [idQuarto, setIdQuarto    ] = useState(0);
   const [numero, setNumero        ] = useState('');
   const [tipo, setTipo            ] = useState('');
   const [preco, setPreco          ] = useState('');
@@ -18,7 +21,7 @@ function Quartos() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:3000/quartos/');
+        const response = await fetch(`${API_URL}/quartos`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -39,6 +42,15 @@ function Quartos() {
     };
   }, [carregaPagina]);
 
+  const limparFormulario = () => {
+      setIdQuarto(0);
+      setNumero('');
+      setTipo('');
+      setPreco('');
+      setDescricao('');
+      setStatus('disponível');
+  };
+
   const salvarQuarto = async (e) => {
       e.preventDefault();
       try {
@@ -47,24 +59,34 @@ function Quartos() {
               tipo: tipo,
               preco: parseFloat(preco),
               descricao: descricao,
-          status: 'disponível'
+              status: status || 'disponível'
           };
-          axios.post('http://localhost:3000/quartos/', dataToSend)
-          .then(function (response) {
-            console.log('Success:', response.data);
-          });
 
-          setNumero('');
-          setTipo('');
-          setPreco('');
-          setDescricao('');
-          setStatus('disponível');
-          setCarregaPagina(!carregaPagina);
+          if (idQuarto > 0) {
+              axios.put(`${API_URL}/quartos/${idQuarto}`, dataToSend)
+              .then(function (response) {
+                console.log('Quarto atualizado:', response.data);
+                limparFormulario();
+                setCarregaPagina(!carregaPagina);
+              })
+              .catch(function (error) {
+                console.error('Erro ao atualizar:', error);
+              });
+          } else {
+              axios.post(`${API_URL}/quartos`, dataToSend)
+              .then(function (response) {
+                console.log('Success:', response.data);
+                limparFormulario();
+                setCarregaPagina(!carregaPagina);
+              })
+              .catch(function (error) {
+                console.error('Erro ao criar:', error);
+              });
+          }
           
           } catch (error) {
-            console.error('Error during POST request:', error);
+            console.error('Error during request:', error);
       }
-
   };
 
   const handleNumero = (event) => {
@@ -85,8 +107,9 @@ function Quartos() {
 
   const handleSelecao = (id) => {
     console.log(id);
-    axios.get('http://localhost:3000/quartos/'+id)
+    axios.get(`${API_URL}/quartos/${id}`)
     .then((response) => {
+      setIdQuarto(response.data['id_quarto']);
       setNumero(response.data['numero']);
       setTipo(response.data['tipo']);
       setPreco(response.data['preco']);
@@ -94,25 +117,20 @@ function Quartos() {
       setStatus(response.data['status']);
       console.log(response);
     });
-
   }
 
   const deletarQuarto = (id) => {
+    if (!window.confirm('Confirmar exclusão?')) return;
     console.log("Deletando quarto:", id);
-    axios.delete('http://localhost:3000/quartos/'+id)
+    axios.delete(`${API_URL}/quartos/${id}`)
     .then((response) => {
       console.log('Quarto deletado com sucesso:', response.data);
+      limparFormulario();
       setCarregaPagina(!carregaPagina);
-      setNumero('');
-      setTipo('');
-      setPreco('');
-      setDescricao('');
-      setStatus('disponível');
     })
     .catch((error) => {
       console.error('Erro ao deletar quarto:', error);
     });
-
   }
 
   return (
@@ -165,7 +183,11 @@ function Quartos() {
           </Row>
           <br></br>
           <Button variant="primary" onClick={salvarQuarto}>
-            Salvar
+            {idQuarto > 0 ? 'Atualizar' : 'Salvar'}
+          </Button>
+          {' '}
+          <Button variant="secondary" onClick={limparFormulario}>
+            Limpar
           </Button>
           <QuartosLista 
             data={quartos} 

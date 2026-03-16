@@ -7,7 +7,10 @@ import { Row, Col } from 'react-bootstrap';
 import axios from "axios";
 import InputGroup from 'react-bootstrap/InputGroup';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 function Limpeza() {
+  const [idLimpeza, setIdLimpeza          ] = useState(0);
   const [quarto, setQuarto                ] = useState('');
   const [tipo, setTipo                    ] = useState('');
   const [observacoes, setObservacoes      ] = useState('');
@@ -19,8 +22,8 @@ function Limpeza() {
     const fetchData = async () => {
       try {
         const [limpezaRes, quartosRes] = await Promise.all([
-          fetch('http://localhost:3000/limpeza/'),
-          fetch('http://localhost:3000/quartos/')
+          fetch(`${API_URL}/limpeza`),
+          fetch(`${API_URL}/quartos`)
         ]);
 
         if (!limpezaRes.ok || !quartosRes.ok) {
@@ -61,6 +64,13 @@ function Limpeza() {
     setObservacoes(event.target.value);
   };
 
+  const limparFormulario = () => {
+      setIdLimpeza(0);
+      setQuarto('');
+      setTipo('');
+      setObservacoes('');
+  };
+
   const salvarPedido = async (e) => {
     e.preventDefault();
     try {
@@ -75,24 +85,38 @@ function Limpeza() {
         observacoes: observacoes
       };
 
-      axios.post('http://localhost:3000/limpeza/', dataToSend)
-        .then(function (response) {
-          console.log('Success:', response.data);
-        });
-
-      setQuarto('');
-      setObservacoes('');
-      setCarregaPagina(!carregaPagina);
+      if (idLimpeza > 0) {
+          axios.put(`${API_URL}/limpeza/${idLimpeza}`, dataToSend)
+          .then(function (response) {
+            console.log('Pedido atualizado:', response.data);
+            limparFormulario();
+            setCarregaPagina(!carregaPagina);
+          })
+          .catch(function (error) {
+            console.error('Erro ao atualizar:', error);
+          });
+      } else {
+          axios.post(`${API_URL}/limpeza`, dataToSend)
+          .then(function (response) {
+            console.log('Success:', response.data);
+            limparFormulario();
+            setCarregaPagina(!carregaPagina);
+          })
+          .catch(function (error) {
+            console.error('Erro ao criar:', error);
+          });
+      }
 
     } catch (error) {
-      console.error('Error during POST request:', error);
+      console.error('Error during request:', error);
     }
   };
 
   const handleSelecao = (id) => {
     console.log(id);
-    axios.get('http://localhost:3000/limpeza/' + id)
+    axios.get(`${API_URL}/limpeza/${id}`)
       .then((response) => {
+        setIdLimpeza(response.data['id_limpeza']);
         setQuarto(response.data['id_quarto']);
         setTipo(response.data['tipo']);
         setObservacoes(response.data['observacoes']);
@@ -101,14 +125,13 @@ function Limpeza() {
   };
 
   const deletarPedido = (id) => {
+    if (!window.confirm('Confirmar exclusão?')) return;
     console.log("Deletando pedido:", id);
-    axios.delete('http://localhost:3000/limpeza/' + id)
+    axios.delete(`${API_URL}/limpeza/${id}`)
       .then((response) => {
         console.log('Pedido deletada com sucesso:', response.data);
+        limparFormulario();
         setCarregaPagina(!carregaPagina);
-        setQuarto('');
-        setTipo('');
-        setObservacoes('');
       })
       .catch((error) => {
         console.error('Erro ao deletar pedido:', error);
@@ -128,7 +151,7 @@ function Limpeza() {
                 <Form.Label>Quarto *</Form.Label>
                 <Form.Select onChange={handleQuarto} value={quarto}>
                   <option value="">Selecione um quarto</option>
-                  {quartos.filter(q => q.status === 'disponível').map((q) => (
+                  {quartos.filter(q => q.status === 'ocupado').map((q) => (
                     <option key={q.id_quarto} value={q.id_quarto}>
                       Quarto {q.numero} - {q.tipo} 
                     </option>
@@ -167,7 +190,11 @@ function Limpeza() {
 
           <br></br>
           <Button variant="success" onClick={salvarPedido}>
-            Salvar Pedido
+            {idLimpeza > 0 ? 'Atualizar Pedido' : 'Salvar Pedido'}
+          </Button>
+          {' '}
+          <Button variant="secondary" onClick={limparFormulario}>
+            Limpar
           </Button>
           <LimpezaLista 
             data={limpeza} 

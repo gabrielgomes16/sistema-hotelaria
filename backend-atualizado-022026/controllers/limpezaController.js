@@ -19,6 +19,15 @@ exports.buscarPorId = async (req, res) => {
   res.json(limpeza);
 };
 
+exports.atualizar = async (req, res) => {
+  const limpeza = await Limpeza.findByPk(req.params.id);
+  if (!limpeza) {
+    return res.status(404).json({ error: 'Registro de limpeza não encontrado.' });
+  }
+  await limpeza.update(req.body);
+  res.json(limpeza);
+};
+
 exports.remover = async (req, res) => {
   await Limpeza.destroy({ where: { id_limpeza: req.params.id } });
   res.status(204).send();

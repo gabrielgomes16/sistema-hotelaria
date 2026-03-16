@@ -21,6 +21,6 @@ app.use('/alimentacao', alimentacaoRoutes);
 app.use('/manutencao', manutencaoRoutes);
 app.use('/limpeza', limpezaRoutes);
 
-sequelize.sync().then(() => {
+sequelize.sync({ alter: true }).then(() => {
   app.listen(3000, () => console.log('Servidor rodando na porta 3000'));
 });

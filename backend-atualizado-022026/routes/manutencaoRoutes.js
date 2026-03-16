@@ -11,6 +11,7 @@ router.get('/api', (req, res) => {
 });
 
 router.post('/', manutencaoControler.criar);
+router.put('/:id', manutencaoControler.atualizar);
 router.get('/', manutencaoControler.listar);
 router.get('/:id', manutencaoControler.buscarPorId);
 router.delete('/:id', manutencaoControler.remover);

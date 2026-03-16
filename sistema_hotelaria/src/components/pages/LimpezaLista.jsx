@@ -1,7 +1,7 @@
 import React from 'react'
 import Button from 'react-bootstrap/Button';
 
-export default function ManutencaoLista(props) {
+export default function LimpezaLista(props) {
 
   const getNumeroQuarto = (id) => {
     const quarto = props.quartos.find(q => q.id_quarto === id);

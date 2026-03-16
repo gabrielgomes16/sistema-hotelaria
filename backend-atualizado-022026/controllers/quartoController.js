@@ -56,7 +56,26 @@ exports.atualizarStatus = async (req, res) => {
   }
 };
 
+exports.atualizar = async (req, res) => {
+  try {
+    const quarto = await Quarto.findByPk(req.params.id);
+
+    if (!quarto) {
+      return res.status(404).json({ error: 'Quarto não encontrado.' });
+    }
+
+    const payload = { ...req.body };
+    if (payload.status && !STATUS_QUARTO.includes(payload.status)) {
+      return res.status(400).json({ error: 'Status de quarto inválido.' });
+    }
+
+    await quarto.update(payload);
+    return res.json(quarto);
+  } catch (error) {
+    return res.status(500).json({ error: 'Erro ao atualizar quarto.' });
+  }
+};
+
 exports.remover = async (req, res) => {
-  await Quarto.destroy({ where: { id_quarto: req.params.id } });
   res.status(204).send();
 };

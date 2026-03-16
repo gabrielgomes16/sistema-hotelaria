@@ -11,6 +11,7 @@ router.get('/api', (req, res) => {
 });
 
 router.post('/', quartoControler.criar);
+router.put('/:id', quartoControler.atualizar);
 router.get('/', quartoControler.listar);
 router.get('/:id', quartoControler.buscarPorId);
 router.patch('/:id/status', quartoControler.atualizarStatus);

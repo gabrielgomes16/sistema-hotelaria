@@ -7,6 +7,8 @@ import { Row, Col } from 'react-bootstrap';
 import axios from "axios";
 import { cpfMask, cepMask } from '../utils/Utils';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 function Hospedes() {
   const [idHospede, setIdHospede] = useState(0);
   const [nome, setNome        ] = useState('');
@@ -23,7 +25,7 @@ function Hospedes() {
     const fetchData = async () => {
       try {
         //setLoading(true); // Set loading state before fetching
-        const response = await fetch('http://localhost:3000/hospedes/');
+        const response = await fetch(`${API_URL}/hospedes`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -55,15 +57,19 @@ function Hospedes() {
               nome: nome,
               email: email,
               telefone: telefone,
-              cpf: cpf
+              cpf: cpf,
+              cep: cep,
+              rua: rua,
+              numero: numero
           };
           
           // Se ID existe e é maior que 0, atualiza (PUT), senão cria novo (POST)
           if (idHospede && idHospede > 0) {
               // Atualizar hospede existente
-              axios.put(`http://localhost:3000/hospedes/${idHospede}`, dataToSend)
+              axios.put(`${API_URL}/hospedes/${idHospede}`, dataToSend)
               .then(function (response) {
                 console.log('Hospede atualizado:', response.data);
+                limparFormulario();
                 setCarregaPagina(!carregaPagina);
               })
               .catch(function (error) {
@@ -71,7 +77,7 @@ function Hospedes() {
               });
           } else {
               // Criar novo hospede
-              axios.post('http://localhost:3000/hospedes/', dataToSend)
+              axios.post(`${API_URL}/hospedes`, dataToSend)
               .then(function (response) {
                 console.log('Novo hospede criado:', response.data);
                 limparFormulario();
@@ -144,7 +150,7 @@ function Hospedes() {
 
   const handleSelecao = (id) => {
     console.log('Selecionando hospede com ID:', id);
-    axios.get('http://localhost:3000/hospedes/'+id)
+    axios.get(`${API_URL}/hospedes/${id}`)
     .then((response) => {
       setIdHospede(response.data['id_hospede']);
       setNome(response.data['nome']);
@@ -162,8 +168,12 @@ function Hospedes() {
   }
 
   const excluirHospede = () => {
-    if (idHospede && idHospede > 0) {
-      axios.delete(`http://localhost:3000/hospedes/${idHospede}`)
+    if (!idHospede || idHospede <= 0) {
+      console.warn('Nenhum hospede selecionado para exclusão.');
+      return;
+    }
+    if (!window.confirm('Confirmar exclusão?')) return;
+    axios.delete(`${API_URL}/hospedes/${idHospede}`)
       .then(function (response) {
         console.log('Hospede excluido:', response.data);
         limparFormulario();
@@ -172,9 +182,6 @@ function Hospedes() {
       .catch(function (error) {
         console.error('Erro ao excluir:', error);
       });
-    } else {
-      console.warn('Nenhum hospede selecionado para exclusão.');
-    }
   }
 
   return (

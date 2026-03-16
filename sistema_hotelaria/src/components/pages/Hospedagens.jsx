@@ -7,7 +7,10 @@ import Card from "react-bootstrap/Card";
 import { Row, Col } from 'react-bootstrap';
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 function Hospedagens() {
+  const [idHospedagem, setIdHospedagem    ] = useState(0);
   const [hospede, setHospede              ] = useState('');
   const [quarto, setQuarto                ] = useState('');
   const [dataEntrada, setDataEntrada      ] = useState('');
@@ -29,12 +32,11 @@ function Hospedagens() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // NOVO: Adicionei a rota de alimentação no Promise.all
         const [hospedagensRes, hospedesRes, quartosRes, alimentacaoRes] = await Promise.all([
-          fetch('http://localhost:3000/hospedagens/'),
-          fetch('http://localhost:3000/hospedes/'),
-          fetch('http://localhost:3000/quartos/'),
-          fetch('http://localhost:3000/alimentacao/')
+          fetch(`${API_URL}/hospedagens`),
+          fetch(`${API_URL}/hospedes`),
+          fetch(`${API_URL}/quartos`),
+          fetch(`${API_URL}/alimentacao`)
         ]);
 
         if (!hospedagensRes.ok || !hospedesRes.ok || !quartosRes.ok || !alimentacaoRes.ok) {
@@ -105,6 +107,17 @@ function Hospedagens() {
 
   const handleObservacoes = (event) => setObservacoes(event.target.value);
 
+  const limparFormulario = () => {
+      setIdHospedagem(0);
+      setHospede('');
+      setQuarto('');
+      setDataEntrada('');
+      setDataSaida('');
+      setDiarias(0);
+      setValorTotal(0);
+      setObservacoes('');
+  };
+
   const salvarHospedagem = async (e) => {
     e.preventDefault();
     try {
@@ -123,23 +136,61 @@ function Hospedagens() {
         observacoes: observacoes
       };
 
-      await axios.post('http://localhost:3000/hospedagens/', dataToSend);
-
-      // DICA: Quando salvar a hospedagem, mude o status do quarto para "ocupado"
-      const quartoAtual = quartos.find(q => q.id_quarto === parseInt(quarto));
-      await axios.put(`http://localhost:3000/quartos/${quarto}`, {
-          ...quartoAtual,
-          status: 'ocupado'
-      });
-
-      setHospede(''); setQuarto(''); setDataEntrada(''); setDataSaida('');
-      setDiarias(0); setValorTotal(0); setObservacoes('');
-      setCarregaPagina(!carregaPagina);
-      alert("Hospedagem salva e quarto ocupado!");
+      if (idHospedagem > 0) {
+          axios.put(`${API_URL}/hospedagens/${idHospedagem}`, dataToSend)
+          .then(function (response) {
+            console.log('Hospedagem atualizada:', response.data);
+            limparFormulario();
+            setCarregaPagina(!carregaPagina);
+          })
+          .catch(function (error) {
+            console.error('Erro ao atualizar:', error);
+          });
+      } else {
+          axios.post(`${API_URL}/hospedagens`, dataToSend)
+          .then(function (response) {
+            console.log('Success:', response.data);
+            limparFormulario();
+            setCarregaPagina(!carregaPagina);
+          })
+          .catch(function (error) {
+            console.error('Erro ao criar:', error);
+          });
+      }
 
     } catch (error) {
-      console.error('Error during POST request:', error);
+      console.error('Error during request:', error);
     }
+  };
+
+  const handleSelecao = (id) => {
+    console.log(id);
+    axios.get(`${API_URL}/hospedagens/${id}`)
+      .then((response) => {
+        setIdHospedagem(response.data['id_hospedagem']);
+        setHospede(response.data['id_hospede']);
+        setQuarto(response.data['id_quarto']);
+        setDataEntrada(response.data['dataEntrada']);
+        setDataSaida(response.data['dataSaida']);
+        setDiarias(response.data['diarias']);
+        setValorTotal(response.data['valorTotal']);
+        setObservacoes(response.data['observacoes']);
+        console.log(response);
+      });
+  };
+
+  const deletarHospedagem = (id) => {
+    if (!window.confirm('Confirmar exclusão?')) return;
+    console.log("Deletando hospedagem:", id);
+    axios.delete(`${API_URL}/hospedagens/${id}`)
+      .then((response) => {
+        console.log('Hospedagem deletada com sucesso:', response.data);
+        limparFormulario();
+        setCarregaPagina(!carregaPagina);
+      })
+      .catch((error) => {
+        console.error('Erro ao deletar hospedagem:', error);
+      });
   };
 
   // --- LÓGICA DO CHECKOUT ---
@@ -153,14 +204,11 @@ function Hospedagens() {
         return;
     }
 
-    // Acha a hospedagem deste quarto. 
-    // OBS: Em um sistema real, seria a hospedagem mais recente ou com status "ativa".
     const hospedagemAtiva = hospedagens.find(h => h.id_quarto === parseInt(idQuartoSelecionado));
     
     if (hospedagemAtiva) {
         const hospedeAtivo = hospedes.find(h => h.id_hospede === hospedagemAtiva.id_hospede);
         
-        // Calcula gastos com alimentação (Preço * Quantidade de todos os pedidos do quarto)
         const valorComidas = pedidosAlimentacao
             .filter(pedido => pedido.id_quarto === parseInt(idQuartoSelecionado))
             .reduce((acc, pedido) => acc + (parseFloat(pedido.preco) * parseInt(pedido.quantidade)), 0);
@@ -180,15 +228,13 @@ function Hospedagens() {
       try {
           const quartoAtual = quartos.find(q => q.id_quarto === parseInt(quartoCheckout));
           
-          // Libera o quarto colocando status como 'disponível'
-          await axios.put(`http://localhost:3000/quartos/${quartoCheckout}`, {
+          await axios.put(`${API_URL}/quartos/${quartoCheckout}`, {
               ...quartoAtual,
               status: 'disponível'
           });
 
           alert("Checkout feito com sucesso! Quarto liberado.");
           
-          // Fecha modal e reseta estados
           setShowCheckout(false);
           setQuartoCheckout('');
           setDadosCheckout(null);
@@ -276,7 +322,11 @@ function Hospedagens() {
 
             <div className="mt-4 gap-2 d-flex">
                 <Button variant="success" onClick={salvarHospedagem}>
-                Salvar Hospedagem
+                {idHospedagem > 0 ? 'Atualizar Hospedagem' : 'Salvar Hospedagem'}
+                </Button>
+                {' '}
+                <Button variant="secondary" onClick={limparFormulario}>
+                Limpar
                 </Button>
                 
                 {/* Botão que ABRE o modal de checkout */}
@@ -290,7 +340,8 @@ function Hospedagens() {
               data={hospedagens} 
               hospedes={hospedes}
               quartos={quartos}
-              // Supondo que você tenha essas props no componente original
+              handleSelecao={handleSelecao}
+              deletarHospedagem={deletarHospedagem}
             />
 
           </Form>
