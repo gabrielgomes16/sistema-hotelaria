@@ -6,6 +6,7 @@ import HospedagensLista from './HospedagensLista';
 import Card from "react-bootstrap/Card";
 import { Row, Col } from 'react-bootstrap';
 import axios from "axios";
+import DatePicker from '../utils/DatePicker';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -85,14 +86,12 @@ function Hospedagens() {
     return 0;
   };
 
-  const handleDataEntrada = (event) => {
-    const data = event.target.value;
+  const handleDataEntrada = (data) => {
     setDataEntrada(data);
     if (dataSaida) calcularValorTotal(data, dataSaida, quarto);
   };
 
-  const handleDataSaida = (event) => {
-    const data = event.target.value;
+  const handleDataSaida = (data) => {
     setDataSaida(data);
     if (dataEntrada) calcularValorTotal(dataEntrada, data, quarto);
   };
@@ -211,13 +210,15 @@ function Hospedagens() {
         
         const valorComidas = pedidosAlimentacao
             .filter(pedido => pedido.id_quarto === parseInt(idQuartoSelecionado))
-            .reduce((acc, pedido) => acc + (parseFloat(pedido.preco) * parseInt(pedido.quantidade)), 0);
+            .reduce((acc, pedido) => acc + ((parseFloat(pedido.preco) || 0) * (parseInt(pedido.quantidade) || 0)), 0);
+
+        const valorQuarto = parseFloat(hospedagemAtiva.valorTotal) || 0;
 
         setDadosCheckout({
             nomeHospede: hospedeAtivo ? hospedeAtivo.nome : 'Desconhecido',
-            valorQuarto: parseFloat(hospedagemAtiva.valorTotal),
+            valorQuarto: valorQuarto,
             valorAlimentacao: valorComidas,
-            valorFinal: parseFloat(hospedagemAtiva.valorTotal) + valorComidas
+            valorFinal: valorQuarto + valorComidas
         });
     } else {
         setDadosCheckout(null);
@@ -286,16 +287,21 @@ function Hospedagens() {
 
             <Row className="mt-3">
               <Col sm={3}>
-                <Form.Group controlId="formDataEntrada">
-                  <Form.Label>Data Entrada *</Form.Label>
-                  <Form.Control type="date" onChange={handleDataEntrada} value={dataEntrada} />
-                </Form.Group>
+                <DatePicker
+                  label="Data Entrada *"
+                  controlId="formDataEntrada"
+                  value={dataEntrada}
+                  onChange={handleDataEntrada}
+                />
               </Col>
               <Col sm={3}>
-                <Form.Group controlId="formDataSaida">
-                  <Form.Label>Data Saída *</Form.Label>
-                  <Form.Control type="date" onChange={handleDataSaida} value={dataSaida} />
-                </Form.Group>
+                <DatePicker
+                  label="Data Saída *"
+                  controlId="formDataSaida"
+                  value={dataSaida}
+                  onChange={handleDataSaida}
+                  minDate={dataEntrada}
+                />
               </Col>
               <Col sm={2}>
                 <Form.Group controlId="formDiarias">

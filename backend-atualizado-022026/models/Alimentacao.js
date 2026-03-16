@@ -7,7 +7,8 @@ const Alimentacao = sequelize.define('Alimentacao', {
   quantidade: { type: DataTypes.STRING(10), allowNull: false }, 
   prato: {type: DataTypes.STRING(50)},
   preco: { type: DataTypes.DECIMAL(10, 2) },
-  observacoes: { type: DataTypes.TEXT }
+  observacoes: { type: DataTypes.TEXT },
+  status: { type: DataTypes.STRING(20), allowNull: false, defaultValue: 'aberto' }
 }, { tableName: 'Alimentacao', timestamps: false });
 
 module.exports = Alimentacao;

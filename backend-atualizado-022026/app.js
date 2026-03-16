@@ -6,6 +6,7 @@ const hospedesRoutes = require('./routes/hospedesRoutes');
 const quartosRoutes = require('./routes/quartosRoutes');
 const hospedagensRoutes = require('./routes/hospedagensRoutes');
 const alimentacaoRoutes = require('./routes/alimentacaoRoutes');
+const cardapioRoutes = require('./routes/cardapioRoutes');
 const manutencaoRoutes = require('./routes/manutencaoRoutes');
 const limpezaRoutes = require('./routes/limpezaRoutes');
 
@@ -18,6 +19,7 @@ app.use('/hospedes', hospedesRoutes);
 app.use('/quartos', quartosRoutes);
 app.use('/hospedagens', hospedagensRoutes);
 app.use('/alimentacao', alimentacaoRoutes);
+app.use('/cardapio', cardapioRoutes);
 app.use('/manutencao', manutencaoRoutes);
 app.use('/limpeza', limpezaRoutes);
 

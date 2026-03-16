@@ -46,6 +46,7 @@ export default function AlimentacaoLista(props) {
             <th scope="col">Quantidade</th>
             <th scope="col">Valor Total</th>
             <th scope="col">Quarto</th>
+            <th scope="col">Status</th>
             <th scope="col">Ação</th>
           </tr>
         </thead>
@@ -64,6 +65,11 @@ export default function AlimentacaoLista(props) {
               <td> {alimentacao.quantidade} </td>
               <td> {formatarMoeda(calcularTotal(alimentacao.preco, alimentacao.quantidade))}  </td>
               <td> {getNumeroQuarto(alimentacao.id_quarto)} ({getTipoQuarto(alimentacao.id_quarto)})</td>
+              <td>
+                <span className={`badge ${alimentacao.status === 'finalizado' ? 'bg-secondary' : 'bg-success'}`}>
+                  {alimentacao.status === 'finalizado' ? 'Finalizado' : 'Aberto'}
+                </span>
+              </td>
 
               <td>
                 <Button 

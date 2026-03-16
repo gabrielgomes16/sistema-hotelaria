@@ -19,7 +19,7 @@ function NavbarTWM() {
               <NavDropdown.Item as={Link} to="/hospedagens">Hospedagens</NavDropdown.Item>
             </NavDropdown>
             <NavDropdown title="Serviços" id="nav-dropdown-servicos">
-              <NavDropdown.Item as={Link} to="/alimentacao">Alimentação</NavDropdown.Item>
+              <NavDropdown.Item as={Link} to="/alimentacao">Cozinha</NavDropdown.Item>
               <NavDropdown.Item as={Link} to="/manutencao">Manutenção</NavDropdown.Item>
               <NavDropdown.Item as={Link} to="/limpeza">Limpeza</NavDropdown.Item>
             </NavDropdown>
