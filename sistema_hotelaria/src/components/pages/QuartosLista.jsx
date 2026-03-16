@@ -1,18 +1,45 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Button from 'react-bootstrap/Button';
+import FiltroLista from '../utils/FiltroLista';
+import { formatarMoeda } from '../utils/Utils';
+
+const camposFiltro = [
+  { valor: 'numero', label: 'Número' },
+  { valor: 'tipo', label: 'Tipo' },
+  { valor: 'status', label: 'Status' },
+];
 
 export default function QuartosLista(props) {
-    const formatStatus = (status) => {
-      if (!status) {
-        return 'disponível';
-      }
+    const [filtroTexto, setFiltroTexto] = useState('');
+    const [filtroCampo, setFiltroCampo] = useState('todos');
 
+    const formatStatus = (status) => {
+      if (!status) return 'disponível';
       return status;
     };
 
+    const handleFiltrar = (texto, campo) => {
+      setFiltroTexto(texto);
+      setFiltroCampo(campo);
+    };
+
+    const dadosFiltrados = props.data.filter((quarto) => {
+      if (!filtroTexto) return true;
+      const texto = filtroTexto.toLowerCase();
+      if (filtroCampo === 'numero') return String(quarto.numero).toLowerCase().includes(texto);
+      if (filtroCampo === 'tipo') return quarto.tipo?.toLowerCase().includes(texto);
+      if (filtroCampo === 'status') return formatStatus(quarto.status).toLowerCase().includes(texto);
+      return (
+        String(quarto.numero).toLowerCase().includes(texto) ||
+        quarto.tipo?.toLowerCase().includes(texto) ||
+        formatStatus(quarto.status).toLowerCase().includes(texto)
+      );
+    });
+
     return (
         <>
-          <table className="table">
+          <FiltroLista campos={camposFiltro} onFiltrar={handleFiltrar} />
+          <table className="table table-striped">
             <thead>
               <tr>
                 <th scope="col">#</th>
@@ -25,19 +52,19 @@ export default function QuartosLista(props) {
               </tr>
             </thead>
             <tbody>
-              {props.data.map((quarto) => (
+              {dadosFiltrados.map((quarto) => (
                 <tr key={quarto.id_quarto}>
                   <td> 
                     <input
                         type="radio"
                         name="rdQuarto"
-                        onChange={(e) =>props.handleSelecao(quarto.id_quarto)}                                            
+                        onChange={(e) => props.handleSelecao(quarto.id_quarto)}                                            
                     />
                   </td>
                   <td> {quarto.id_quarto}</td>                  
                   <td> {quarto.numero}</td>
                   <td> {quarto.tipo}</td>
-                  <td> R$ {parseFloat(quarto.preco).toFixed(2)}</td>
+                  <td> {formatarMoeda(quarto.preco)}</td>
                   <td> {formatStatus(quarto.status)}</td>
                   <td>
                     <Button 

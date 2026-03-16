@@ -1,7 +1,16 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Button from 'react-bootstrap/Button';
+import FiltroLista from '../utils/FiltroLista';
+
+const camposFiltro = [
+  { valor: 'tipo', label: 'Tipo' },
+  { valor: 'quarto', label: 'Quarto' },
+  { valor: 'status', label: 'Status' },
+];
 
 export default function LimpezaLista(props) {
+  const [filtroTexto, setFiltroTexto] = useState('');
+  const [filtroCampo, setFiltroCampo] = useState('todos');
 
   const getNumeroQuarto = (id) => {
     const quarto = props.quartos.find(q => q.id_quarto === id);
@@ -13,9 +22,29 @@ export default function LimpezaLista(props) {
     return quarto ? quarto.tipo : 'N/A';
   };
 
+  const handleFiltrar = (texto, campo) => {
+    setFiltroTexto(texto);
+    setFiltroCampo(campo);
+  };
+
+  const dadosFiltrados = props.data.filter((limpeza) => {
+    if (!filtroTexto) return true;
+    const texto = filtroTexto.toLowerCase();
+    const numeroQuarto = String(getNumeroQuarto(limpeza.id_quarto)).toLowerCase();
+    const statusTexto = limpeza.status === 'finalizado' ? 'finalizado' : 'aberto';
+    if (filtroCampo === 'tipo') return limpeza.tipo?.toLowerCase().includes(texto);
+    if (filtroCampo === 'quarto') return numeroQuarto.includes(texto);
+    if (filtroCampo === 'status') return statusTexto.includes(texto);
+    return (
+      limpeza.tipo?.toLowerCase().includes(texto) ||
+      numeroQuarto.includes(texto) ||
+      statusTexto.includes(texto)
+    );
+  });
+
   return (
     <>
-      <br></br>
+      <FiltroLista campos={camposFiltro} onFiltrar={handleFiltrar} />
       <table className="table table-striped">
         <thead>
           <tr>
@@ -28,7 +57,7 @@ export default function LimpezaLista(props) {
           </tr>
         </thead>
         <tbody>
-          {props.data.map((limpeza) => (
+          {dadosFiltrados.map((limpeza) => (
             <tr key={limpeza.id_limpeza}>
               <td> 
                 <input
@@ -45,7 +74,6 @@ export default function LimpezaLista(props) {
                   {limpeza.status === 'finalizado' ? 'Finalizado' : 'Aberto'}
                 </span>
               </td>
-
               <td>
                 <Button 
                   variant="danger" 
