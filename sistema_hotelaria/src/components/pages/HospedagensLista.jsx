@@ -1,7 +1,16 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Button from 'react-bootstrap/Button';
+import FiltroLista from '../utils/FiltroLista';
+import { formatarMoeda, formatarData } from '../utils/Utils';
+
+const camposFiltro = [
+  { valor: 'hospede', label: 'Hóspede' },
+  { valor: 'quarto', label: 'Quarto' },
+];
 
 export default function HospedagensLista(props) {
+  const [filtroTexto, setFiltroTexto] = useState('');
+  const [filtroCampo, setFiltroCampo] = useState('todos');
 
   const getNomeHospede = (id) => {
     const hospede = props.hospedes.find(h => h.id_hospede === id);
@@ -18,14 +27,24 @@ export default function HospedagensLista(props) {
     return quarto ? quarto.tipo : 'N/A';
   };
 
-  const formatarData = (data) => {
-    const date = new Date(data);
-    return date.toLocaleDateString('pt-BR');
+  const handleFiltrar = (texto, campo) => {
+    setFiltroTexto(texto);
+    setFiltroCampo(campo);
   };
+
+  const dadosFiltrados = props.data.filter((hospedagem) => {
+    if (!filtroTexto) return true;
+    const texto = filtroTexto.toLowerCase();
+    const nomeHospede = getNomeHospede(hospedagem.id_hospede).toLowerCase();
+    const numeroQuarto = String(getNumeroQuarto(hospedagem.id_quarto)).toLowerCase();
+    if (filtroCampo === 'hospede') return nomeHospede.includes(texto);
+    if (filtroCampo === 'quarto') return numeroQuarto.includes(texto);
+    return nomeHospede.includes(texto) || numeroQuarto.includes(texto);
+  });
 
   return (
     <>
-      <br></br>
+      <FiltroLista campos={camposFiltro} onFiltrar={handleFiltrar} />
       <table className="table table-striped">
         <thead>
           <tr>
@@ -41,7 +60,7 @@ export default function HospedagensLista(props) {
           </tr>
         </thead>
         <tbody>
-          {props.data.map((hospedagem) => (
+          {dadosFiltrados.map((hospedagem) => (
             <tr key={hospedagem.id_hospedagem}>
               <td> 
                 <input
@@ -56,7 +75,7 @@ export default function HospedagensLista(props) {
               <td> {formatarData(hospedagem.dataEntrada)}</td>
               <td> {formatarData(hospedagem.dataSaida)}</td>
               <td> {hospedagem.diarias}</td>
-              <td> R$ {parseFloat(hospedagem.valorTotal).toFixed(2)}</td>
+              <td> {formatarMoeda(hospedagem.valorTotal)}</td>
               <td>
                 <Button 
                   variant="danger" 

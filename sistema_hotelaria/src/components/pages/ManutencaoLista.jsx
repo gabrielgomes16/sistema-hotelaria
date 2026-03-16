@@ -1,7 +1,16 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Button from 'react-bootstrap/Button';
+import FiltroLista from '../utils/FiltroLista';
+
+const camposFiltro = [
+  { valor: 'problema', label: 'Problema' },
+  { valor: 'quarto', label: 'Quarto' },
+  { valor: 'status', label: 'Status' },
+];
 
 export default function ManutencaoLista(props) {
+  const [filtroTexto, setFiltroTexto] = useState('');
+  const [filtroCampo, setFiltroCampo] = useState('todos');
 
   const getNumeroQuarto = (id) => {
     const quarto = props.quartos.find(q => q.id_quarto === id);
@@ -13,9 +22,29 @@ export default function ManutencaoLista(props) {
     return quarto ? quarto.tipo : 'N/A';
   };
 
+  const handleFiltrar = (texto, campo) => {
+    setFiltroTexto(texto);
+    setFiltroCampo(campo);
+  };
+
+  const dadosFiltrados = props.data.filter((manutencao) => {
+    if (!filtroTexto) return true;
+    const texto = filtroTexto.toLowerCase();
+    const numeroQuarto = String(getNumeroQuarto(manutencao.id_quarto)).toLowerCase();
+    const statusTexto = manutencao.status === 'finalizado' ? 'finalizado' : 'aberto';
+    if (filtroCampo === 'problema') return manutencao.problema?.toLowerCase().includes(texto);
+    if (filtroCampo === 'quarto') return numeroQuarto.includes(texto);
+    if (filtroCampo === 'status') return statusTexto.includes(texto);
+    return (
+      manutencao.problema?.toLowerCase().includes(texto) ||
+      numeroQuarto.includes(texto) ||
+      statusTexto.includes(texto)
+    );
+  });
+
   return (
     <>
-      <br></br>
+      <FiltroLista campos={camposFiltro} onFiltrar={handleFiltrar} />
       <table className="table table-striped">
         <thead>
           <tr>
@@ -28,7 +57,7 @@ export default function ManutencaoLista(props) {
           </tr>
         </thead>
         <tbody>
-          {props.data.map((manutencao) => (
+          {dadosFiltrados.map((manutencao) => (
             <tr key={manutencao.id_manutencao}>
               <td> 
                 <input
@@ -45,7 +74,6 @@ export default function ManutencaoLista(props) {
                   {manutencao.status === 'finalizado' ? 'Finalizado' : 'Aberto'}
                 </span>
               </td>
-
               <td>
                 <Button 
                   variant="danger" 

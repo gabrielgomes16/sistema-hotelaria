@@ -1,7 +1,17 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Button from 'react-bootstrap/Button';
+import FiltroLista from '../utils/FiltroLista';
+import { formatarMoeda } from '../utils/Utils';
+
+const camposFiltro = [
+  { valor: 'prato', label: 'Prato' },
+  { valor: 'quarto', label: 'Quarto' },
+  { valor: 'status', label: 'Status' },
+];
 
 export default function AlimentacaoLista(props) {
+  const [filtroTexto, setFiltroTexto] = useState('');
+  const [filtroCampo, setFiltroCampo] = useState('todos');
 
   const getNumeroQuarto = (id) => {
     const quarto = props.quartos.find(q => q.id_quarto === id);
@@ -13,30 +23,36 @@ export default function AlimentacaoLista(props) {
     return quarto ? quarto.tipo : 'N/A';
   };
 
-   const calcularTotal = (preco, quantidade) => {
-      const precoN = parseFloat(preco);
-      const quantidadeN = parseInt(quantidade, 10);
-
-      if(isNaN(precoN) || isNaN(quantidadeN)) return 0;
-
-      return precoN * quantidadeN;
-   };
-
-  const formatarMoeda = (valor) => {
-    const numero = parseFloat(valor);
-    
-      if (isNaN(numero)) return 'R$ 0,00'; 
-
-      return new Intl.NumberFormat('pt-BR', {
-        style: 'currency',
-        currency: 'BRL'
-      }).format(numero);
+  const calcularTotal = (preco, quantidade) => {
+    const precoN = parseFloat(preco);
+    const quantidadeN = parseInt(quantidade, 10);
+    if (isNaN(precoN) || isNaN(quantidadeN)) return 0;
+    return precoN * quantidadeN;
   };
 
+  const handleFiltrar = (texto, campo) => {
+    setFiltroTexto(texto);
+    setFiltroCampo(campo);
+  };
+
+  const dadosFiltrados = props.data.filter((alimentacao) => {
+    if (!filtroTexto) return true;
+    const texto = filtroTexto.toLowerCase();
+    const numeroQuarto = String(getNumeroQuarto(alimentacao.id_quarto)).toLowerCase();
+    const statusTexto = alimentacao.status === 'finalizado' ? 'finalizado' : 'aberto';
+    if (filtroCampo === 'prato') return alimentacao.prato?.toLowerCase().includes(texto);
+    if (filtroCampo === 'quarto') return numeroQuarto.includes(texto);
+    if (filtroCampo === 'status') return statusTexto.includes(texto);
+    return (
+      alimentacao.prato?.toLowerCase().includes(texto) ||
+      numeroQuarto.includes(texto) ||
+      statusTexto.includes(texto)
+    );
+  });
 
   return (
     <>
-      <br></br>
+      <FiltroLista campos={camposFiltro} onFiltrar={handleFiltrar} />
       <table className="table table-striped">
         <thead>
           <tr>
@@ -51,7 +67,7 @@ export default function AlimentacaoLista(props) {
           </tr>
         </thead>
         <tbody>
-          {props.data.map((alimentacao) => (
+          {dadosFiltrados.map((alimentacao) => (
             <tr key={alimentacao.id_alimentacao}>
               <td> 
                 <input
@@ -70,7 +86,6 @@ export default function AlimentacaoLista(props) {
                   {alimentacao.status === 'finalizado' ? 'Finalizado' : 'Aberto'}
                 </span>
               </td>
-
               <td>
                 <Button 
                   variant="danger" 
