@@ -16,6 +16,7 @@ function Manutencao() {
   const [observacoes, setObservacoes      ] = useState('');
   const [quartos, setQuartos              ] = useState([]);
   const [manutencao, setManutencao        ] = useState([]);
+  const [status, setStatus                ] = useState('aberto');
   const [carregaPagina, setCarregaPagina  ] = useState(false);
 
   useEffect(() => {
@@ -69,6 +70,7 @@ function Manutencao() {
       setQuarto('');
       setProblema('');
       setObservacoes('');
+      setStatus('aberto');
   };
 
   const salvarPedido = async (e) => {
@@ -82,7 +84,8 @@ function Manutencao() {
       const dataToSend = {
         id_quarto: parseInt(quarto),
         problema: problema,
-        observacoes: observacoes
+        observacoes: observacoes,
+        status: status
       };
 
       if (idManutencao > 0) {
@@ -120,6 +123,7 @@ function Manutencao() {
         setQuarto(response.data['id_quarto']);
         setProblema(response.data['problema']);
         setObservacoes(response.data['observacoes']);
+        setStatus(response.data['status'] || 'aberto');
         console.log(response);
       });
   };
@@ -188,6 +192,20 @@ function Manutencao() {
               </Form.Group>
             </Col>
           </Row>
+
+          {idManutencao > 0 && (
+            <Row className="mt-3">
+              <Col sm={3}>
+                <Form.Group controlId="formStatus">
+                  <Form.Label>Status</Form.Label>
+                  <Form.Select onChange={(e) => setStatus(e.target.value)} value={status}>
+                    <option value="aberto">Aberto</option>
+                    <option value="finalizado">Finalizado</option>
+                  </Form.Select>
+                </Form.Group>
+              </Col>
+            </Row>
+          )}
 
           <br></br>
           <Button variant="success" onClick={salvarPedido}>

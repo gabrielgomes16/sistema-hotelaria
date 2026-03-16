@@ -19,6 +19,7 @@ function Alimentacao() {
   const [observacoes, setObservacoes      ] = useState('');
   const [quartos, setQuartos              ] = useState([]);
   const [alimentacao, setAlimentacao      ] = useState([]);
+  const [status, setStatus                ] = useState('aberto');
   const [carregaPagina, setCarregaPagina] = useState(false);
 
   const [opcoesPratos, setOpcoesPratos] = useState([]);
@@ -93,6 +94,7 @@ function Alimentacao() {
       setPreco('');
       setQuantidade('');
       setObservacoes('');
+      setStatus('aberto');
   };
 
   const adicionarNovoPrato = async () => {
@@ -139,7 +141,8 @@ function Alimentacao() {
         prato: nomeDoPratoParaSalvar,
         preco: parseFloat(preco),
         quantidade: parseInt(quantidade),
-        observacoes: observacoes
+        observacoes: observacoes,
+        status: status
       };
 
       if (idAlimentacao > 0) {
@@ -181,6 +184,7 @@ function Alimentacao() {
         setPreco(response.data['preco']);
         setQuantidade(response.data['quantidade']);
         setObservacoes(response.data['observacoes']);
+        setStatus(response.data['status'] || 'aberto');
       });
   };
 
@@ -256,6 +260,17 @@ function Alimentacao() {
                   <Form.Control type="number" placeholder="Quantidade" onChange={handleQuantidade} value={quantidade} min="1" />
                 </Form.Group>
               </Col>
+              {idAlimentacao > 0 && (
+                <Col sm={3}>
+                  <Form.Group controlId="formStatus">
+                    <Form.Label>Status</Form.Label>
+                    <Form.Select onChange={(e) => setStatus(e.target.value)} value={status}>
+                      <option value="aberto">Aberto</option>
+                      <option value="finalizado">Finalizado</option>
+                    </Form.Select>
+                  </Form.Group>
+                </Col>
+              )}
             </Row>
 
             <Row className="mt-3">

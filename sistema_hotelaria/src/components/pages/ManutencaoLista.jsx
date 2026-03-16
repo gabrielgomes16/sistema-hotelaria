@@ -23,6 +23,7 @@ export default function ManutencaoLista(props) {
             <th scope="col">ID</th>
             <th scope="col">Problema</th>
             <th scope="col">Quarto</th>
+            <th scope="col">Status</th>
             <th scope="col">Ação</th>
           </tr>
         </thead>
@@ -39,6 +40,11 @@ export default function ManutencaoLista(props) {
               <td> {manutencao.id_manutencao}</td>
               <td> {manutencao.problema} </td>
               <td> {getNumeroQuarto(manutencao.id_quarto)} ({getTipoQuarto(manutencao.id_quarto)})</td>
+              <td>
+                <span className={`badge ${manutencao.status === 'finalizado' ? 'bg-secondary' : 'bg-success'}`}>
+                  {manutencao.status === 'finalizado' ? 'Finalizado' : 'Aberto'}
+                </span>
+              </td>
 
               <td>
                 <Button 

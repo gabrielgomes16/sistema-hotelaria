@@ -16,6 +16,7 @@ function Limpeza() {
   const [observacoes, setObservacoes      ] = useState('');
   const [quartos, setQuartos              ] = useState([]);
   const [limpeza, setLimpeza      ] = useState([]);
+  const [status, setStatus                ] = useState('aberto');
   const [carregaPagina, setCarregaPagina  ] = useState(false);
 
   useEffect(() => {
@@ -69,6 +70,7 @@ function Limpeza() {
       setQuarto('');
       setTipo('');
       setObservacoes('');
+      setStatus('aberto');
   };
 
   const salvarPedido = async (e) => {
@@ -82,7 +84,8 @@ function Limpeza() {
       const dataToSend = {
         id_quarto: parseInt(quarto),
         tipo: tipo,
-        observacoes: observacoes
+        observacoes: observacoes,
+        status: status
       };
 
       if (idLimpeza > 0) {
@@ -120,6 +123,7 @@ function Limpeza() {
         setQuarto(response.data['id_quarto']);
         setTipo(response.data['tipo']);
         setObservacoes(response.data['observacoes']);
+        setStatus(response.data['status'] || 'aberto');
         console.log(response);
       });
   };
@@ -187,6 +191,20 @@ function Limpeza() {
               </Form.Group>
             </Col>
           </Row>
+
+          {idLimpeza > 0 && (
+            <Row className="mt-3">
+              <Col sm={3}>
+                <Form.Group controlId="formStatus">
+                  <Form.Label>Status</Form.Label>
+                  <Form.Select onChange={(e) => setStatus(e.target.value)} value={status}>
+                    <option value="aberto">Aberto</option>
+                    <option value="finalizado">Finalizado</option>
+                  </Form.Select>
+                </Form.Group>
+              </Col>
+            </Row>
+          )}
 
           <br></br>
           <Button variant="success" onClick={salvarPedido}>

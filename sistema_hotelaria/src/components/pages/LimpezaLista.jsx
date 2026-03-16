@@ -23,6 +23,7 @@ export default function LimpezaLista(props) {
             <th scope="col">ID</th>
             <th scope="col">Tipo</th>
             <th scope="col">Quarto</th>
+            <th scope="col">Status</th>
             <th scope="col">Ação</th>
           </tr>
         </thead>
@@ -39,6 +40,11 @@ export default function LimpezaLista(props) {
               <td> {limpeza.id_limpeza}</td>
               <td> {limpeza.tipo} </td>
               <td> {getNumeroQuarto(limpeza.id_quarto)} ({getTipoQuarto(limpeza.id_quarto)})</td>
+              <td>
+                <span className={`badge ${limpeza.status === 'finalizado' ? 'bg-secondary' : 'bg-success'}`}>
+                  {limpeza.status === 'finalizado' ? 'Finalizado' : 'Aberto'}
+                </span>
+              </td>
 
               <td>
                 <Button 
